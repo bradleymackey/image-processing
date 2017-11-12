@@ -14,41 +14,50 @@ def fixIndexValue(index,maxIndex):
         # otherwise, just return the value
         return index
 
-def imageErosion(image):
-    """performs erosion on an image and returns this"""
-    # note: to match cv2's behaviour, when the structuring element is in a corner (overhanging), the non-existant pixel values are the reflections of the existant pixel values.
+def pixelValuesForStruturingElementPosition(image,horizontal,vertical):
+    """returns the pixel values that the 5x5 structuring element is currently over for a given image and centre position where the strucuring element currently is"""
+    # where the values will be stored
+    values = []
+    # get image size using numpy
+    height, width = np.shape(image)
+    # iterate over all neighbours of this pixel to find the minimum
+    # k is the current neighbouring pixel horizontal index
+    for structuringHorizontal in range(horizontal-2,horizontal+3):
+        # l is the current neighbouring pixel vertical index
+        for structuringVertical in range(vertical-2,vertical+3):
+            # fix the index values so we don't get an out-of-bounds error
+            structuringHorizontal = fixIndexValue(structuringHorizontal,width)
+            structuringVertical = fixIndexValue(structuringVertical,height)
+            # get the pixel value of this neighbouring pixel
+            neighbourPixel = image[structuringHorizontal][structuringVertical]
+            values.append(neighbourPixel)
+    # return the pixel values that the structuring element is currently over
+    return values
 
+def morphologicalTransformation(image,selectionFunction):
+    """performs a morphological transformation on a given image using a given selection function (e.g. max, min) which selects a given pixel from the pixels that the structuring element is currently over"""
     # define the structuring element
     structure = np.ones((5,5),np.uint8)
     # get image size using numpy
     height, width = np.shape(image)
-    # make a copy of the image to save our eroded image to
-    eroded_image = image.copy()
+    # make a copy of the image to save our resultant image to
+    result_image = image.copy()
     # iterate over all pixels in the image
-    # i is the current horizontal index
-    for i in range(0,width):
-        # j is the current vertical index
-        for j in range(0,height):
-            # the current minimum value of the neighbouring pixels (initalised to -1)
-            currentMinNeighbour = -1
-            # iterate over all neighbours of this pixel to find the minimum
-            # k is the current neighbouring pixel horizontal index
-            for k in range(i-2,i+3):
-                # l is the current neighbouring pixel vertical index
-                for l in range(j-2,j+3):
-                    # fix the index values so we don't get an out-of-bounds error
-                    k = fixIndexValue(k,width)
-                    l = fixIndexValue(l,height)
-                    # get the pixel value of this neighbouring pixel
-                    thisNeighbourPixel = image[k][l]
-                    # if we have not yet set the minmum pixel value, set it
-                    if currentMinNeighbour==-1:
-                        currentMinNeighbour = thisNeighbourPixel
-                    # if the neighbouring pixel value is the new lowest, set it
-                    elif thisNeighbourPixel<currentMinNeighbour:
-                        currentMinNeighbour = thisNeighbourPixel
-            # set this minimum neighbour value to be the new value in the new image
-            eroded_image[i][j] = currentMinNeighbour
+    # current horizontal index
+    for horizontal in range(0,width):
+        # current vertical index
+        for vertical in range(0,height):
+            # the the current pixel values that the structuring element is currently over
+            structuringElementPixels = pixelValuesForStruturingElementPosition(image,horizontal,vertical)
+            # set the value at this location to be a chosen pixel according to the `selectionFunction`
+            result_image[horizontal][vertical] = selectionFunction(structuringElementPixels)
+    # return the resultant image
+    return result_image
+
+def imageErosion(image):
+    """performs erosion on an image and returns this"""
+    # produce the eroded image by using the 'min' selection function which will use the minimum pixel value that the structuring element is currently over
+    eroded_image = morphologicalTransformation(image,min)
     # return the eroded image
     return eroded_image
 

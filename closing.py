@@ -1,5 +1,6 @@
 import cv2
 import sys
+# import needed functions from the needed files
 from dilation import imageDilation
 from erosion import imageErosion
 
