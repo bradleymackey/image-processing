@@ -1,6 +1,5 @@
 import cv2
 import sys
-import numpy as np
 # the function that can easily perform a morphological transformation
 from erosion import morphologicalTransformation
 
