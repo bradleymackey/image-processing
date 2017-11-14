@@ -1,33 +1,17 @@
 import cv2
 import sys
-import numpy as np
-
-def fixIndexValue(index,maxIndex):
-    """fixes an index value to mimic the reflection off the border property, so we do not get an out-of-bounds error when the structuring element is in the corner"""
-    if index < 0:
-        # if we are trying to access an index less than 0, just invert the index (reflected value)
-        return -index
-    elif index>=maxIndex:
-        # if we are trying to access a number greater than the max, return the reflected value
-        return maxIndex-(index-maxIndex)-1
-    else:
-        # otherwise, just return the value
-        return index
 
 def pixelValuesForStruturingElementPosition(image,horizontal,vertical):
     """returns the pixel values that the 5x5 structuring element is currently over for a given image and centre position where the strucuring element currently is"""
     # where the values will be stored
     values = []
     # get image size using numpy
-    height, width = np.shape(image)
+    height, width = image.shape
     # iterate over all neighbours of this pixel to find the minimum
     # k is the current neighbouring pixel horizontal index
-    for structuringHorizontal in range(horizontal-2,horizontal+3):
+    for structuringHorizontal in range(max(0,horizontal-2),min(width,horizontal+3)):
         # l is the current neighbouring pixel vertical index
-        for structuringVertical in range(vertical-2,vertical+3):
-            # fix the index values so we don't get an out-of-bounds error
-            structuringHorizontal = fixIndexValue(structuringHorizontal,width)
-            structuringVertical = fixIndexValue(structuringVertical,height)
+        for structuringVertical in range(max(0,vertical-2),min(height,vertical+3)):
             # get the pixel value of this neighbouring pixel
             neighbourPixel = image[structuringHorizontal][structuringVertical]
             values.append(neighbourPixel)
@@ -36,10 +20,8 @@ def pixelValuesForStruturingElementPosition(image,horizontal,vertical):
 
 def morphologicalTransformation(image,selectionFunction):
     """performs a morphological transformation on a given image using a given selection function (e.g. max, min) which selects a given pixel from the pixels that the structuring element is currently over"""
-    # define the structuring element
-    structure = np.ones((5,5),np.uint8)
     # get image size using numpy
-    height, width = np.shape(image)
+    height, width = image.shape
     # make a copy of the image to save our resultant image to
     result_image = image.copy()
     # iterate over all pixels in the image
