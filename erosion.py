@@ -38,7 +38,6 @@ def morphologicalTransformation(image,selectionFunction):
 
 def imageErosion(image):
     """performs erosion on an image and returns this"""
-    print "performing erosion"
     # produce the eroded image by using the 'min' selection function which will use the minimum pixel value that the structuring element is currently over
     eroded_image = morphologicalTransformation(image,min)
     # return the eroded image

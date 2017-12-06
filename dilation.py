@@ -5,7 +5,6 @@ from erosion import morphologicalTransformation
 
 def imageDilation(image):
     """performs dilation on an image and returns this"""
-    print "performing dilation"
     # produce the dilated image by using the 'max' selection function which will use the maximum pixel value that the structuring element is currently over
     dilated_image = morphologicalTransformation(image,max)
     # return the dilated image
