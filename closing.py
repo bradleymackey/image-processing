@@ -4,6 +4,7 @@ import sys
 from dilation import imageDilation
 from erosion import imageErosion
 
+print "performing closing"
 # read the image from the filename in greyscale
 greyscale_image = cv2.imread(sys.argv[1],0)
 # produce the dilated image

@@ -4,6 +4,7 @@ import sys
 from erosion import imageErosion
 from dilation import imageDilation
 
+print "performing opening"
 # read the image from the filename in greyscale
 greyscale_image = cv2.imread(sys.argv[1],0)
 # produce the eroded image
